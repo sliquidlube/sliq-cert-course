@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hello, world!</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="description" content="" />
+    <link rel="icon" href="favicon.png" />
+  </head>
+  <body
+    style="
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+        Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue',
+        sans-serif;
+    "
+  >
+    <div
+      style="display: flex; justify-content: center; padding: 0px; margin: 0px"
+      id="cert-top-div"
+    ></div>
+    <div id="cert-root"></div>
+
+    <div
+      id="courses-div"
+      style="display: none; justify-content: center; flex-direction: row"
+    ></div>
+
+    <div
+      id="quiz-info-div"
+      style="display: flex; justify-content: center; margin: 50px"
+    >
+      <div
+        style="
+          display: flex;
+          justify-content: center;
+          flex-direction: column;
+          box-shadow: 0px 0px 4px grey;
+          border-radius: 5px;
+          padding: 50px;
+        "
+      >
+        <h1>Become Sliquid Certifed</h1>
+        <input
+          required
+          id="quiz-email-input"
+          style="padding: 10px; margin-bottom: 20px; border: solid 1px grey"
+          type="email"
+          placeholder="enter email"
+        />
+        <input
+          required
+          id="quiz-name-input"
+          style="padding: 10px; margin-bottom: 20px; border: solid 1px grey"
+          placeholder="enter name"
+        />
+        <input id="quiz-submit" type="submit" />
+      </div>
+    </div>
+
+    <!-- MANUAL CONFIG -->
+    <script>
+      localStorage.setItem("currentLocation", "lessons");
+      localStorage.setItem("currentCourse", "naturals");
+    </script>
+    <!-- FUNCTIONS -->
+    <script>
+      const subActiveEventHandlers = (j) => {
+        (() => {
+          for (let i = 0; i < lessonsAmount[j]; i++) {
+            document
+              .getElementById(`pcourse-${i}-${j}`)
+              .addEventListener("click", () => {
+                render("incourse", "", j, i);
+                render("questions", "", j, i);
+                for (let k = 0; k < 4; k++) {
+                  document
+                    .getElementById(`q-${j}-${i}-${k}`)
+                    .addEventListener("click", (e) => {
+                      currrentAnswer = e.target.value;
+                      alert(currrentAnswer);
+                    });
+                }
+                document
+                  .getElementById("in-course-back-btn")
+                  .addEventListener("click", () => {
+                    document.getElementById("cert-root").innerHTML = "";
+                    document.getElementById(
+                      "cert-root"
+                    ).innerHTML = `<button style="border: none; background-color: white; margin: 10px;" id="back-btn"> <img width=30
+                                src="https://sliquid.com/wp-content/uploads/2024/03/left-arrow-back-button-back-arrow-icon-vector.jpg"/> </button>`;
+                    render("lessons", localStorage.getItem("currentCourse"), j);
+                  });
+              });
+          }
+          document.getElementById("courses-div").style.display = "none";
+          document.getElementById("back-btn").addEventListener("click", () => {
+            document.getElementById("courses-div").style.display = "flex";
+            document.getElementById("cert-root").innerHTML = "";
+            render("courses");
+            activeEventHandlers();
+          });
+        })();
+      };
+
+      const activeEventHandlers = () => {
+        for (let j = 0; j < 4; j++) {
+          (() => {
+            document
+              .getElementById(`lesson-div-${j}`)
+              .addEventListener("click", (e) => {
+                render("lessons", "", j, 0);
+                for (let i = 0; i < lessonsAmount[j]; i++) {
+                  document
+                    .getElementById(`pcourse-${i}-${j}`)
+                    .addEventListener("click", () => {
+                      render("incourse", "", j, i);
+                      render("questions", "", j, i);
+                      for (let k = 0; k < 4; k++) {
+                        document
+                          .getElementById(`q-${j}-${i}-${k}`)
+                          .addEventListener("click", (e) => {
+                            currrentAnswer = e.target.value;
+                            alert(currrentAnswer);
+                          });
+                      }
+                      document
+                        .getElementById("in-course-back-btn")
+                        .addEventListener("click", () => {
+                          document.getElementById("cert-root").innerHTML = "";
+                          document.getElementById(
+                            "cert-root"
+                          ).innerHTML = `<button style="border: none; background-color: white; margin: 10px;" id="back-btn"> <img width=30
+                                src="https://sliquid.com/wp-content/uploads/2024/03/left-arrow-back-button-back-arrow-icon-vector.jpg"/> </button>`;
+                          render("lessons", "", j);
+                        });
+                    });
+                }
+                document.getElementById("courses-div").style.display = "none";
+                document
+                  .getElementById("back-btn")
+                  .addEventListener("click", () => {
+                    document.getElementById("courses-div").style.display =
+                      "flex";
+                    document.getElementById("cert-root").innerHTML = "";
+                  });
+              });
+          })();
+        }
+      };
+
+      const render = (renderString, category, cindex, iindex) => {
+        switch (renderString) {
+          case "init": {
+            document.getElementById("quiz-info-div").style.display = "none";
+            document.getElementById("courses-div").style.display = "flex";
+            document.getElementById("cert-top-div").innerHTML = `
+            <h3 style="position: absolute; left: 20px; border-right: solid 1px #00a2e1; padding: 8px; padding-right: 20px;"> ${localStorage.getItem(
+              "name"
+            )} </h3>
+            <h3 style="padding: 8px; font-weight: 200;"> home </h3>
+            <h3 style="padding: 8px; font-weight: 200;"> courses </h3>
+            <h3 style="padding: 8px; font-weight: 200"> completed </h3>
+            <img width=50 style="position: absolute; right: 20px; padding: 8px; padding-right: 20px;" src="https://sliquid.com/wp-content/uploads/2023/10/cropped-LotusFavicon.png" />
+          `;
+            break;
+            return;
+          }
+          case "courses": {
+            document.getElementById("courses-div").innerHTML = "";
+            for (let i = 0; i < 4; i++) {
+              document.getElementById("courses-div").innerHTML += `
+            <div id="lesson-div-${i}" style="display: flex; justify-content: center;">
+                <div class="course-con" style="box-shadow: 5px 5px 28px rgb(210 210 210); border-radius: 5px; margin: 20px; cursor: pointer">
+                  <img style="border-radius: 5px 5px 0px 0px" src="${picsSrc[i]}" width=300 />
+                  <div style="width: 100%;  display: flex; justify-content: center; flex-direction: column;">
+                    <h2 style="display: flex; justify-content: center; font-weight: 100; color: grey;"> ${titles[i]} </h2>
+                    <h3 style="display: flex; justify-content: center; font-weight: 300; color: rgb(85 85 85)"> ${descriptions[i]}</h3>
+                      <div style="display: flex; justify-content: center; gap: 40px">
+                        <div style="display: flex;">
+                          <img width=45 height=45 src="https://sliquid.com/wp-content/uploads/2024/03/360_F_163489083_ePjmcRDlTr9qi2Et08f0J001vp5YZuW4.jpg"/>
+                          <p style="color: #00a2e1;"> ${lessonsAmount[i]} lessons </p>
+                        </div>
+                        <div style="display: flex;">
+                          <img width=45 height=45 src="https://sliquid.com/wp-content/uploads/2024/03/360_F_529739662_yRW6APsQg3PaJGQ6afQL8hDdod0OR1re.jpg" />
+                          <p style="color: #00a2e1;"> 1 hour </p>
+                        </div>
+                      </div>
+                  </div>
+                </div>
+            </div>
+            `;
+            }
+            break;
+            return;
+          }
+          case "incourse": {
+            let j = cindex;
+            let i = iindex;
+            if (!(category === "")) {
+              switch (category) {
+                case "naturals": {
+                  j = 0;
+                  break;
+                }
+                case "organics": {
+                  j = 1;
+                  break;
+                }
+                case "balance": {
+                  j = 2;
+                  break;
+                }
+                case "misc": {
+                  j = 3;
+                  break;
+                }
+              }
+            }
+            document.getElementById("cert-root").innerHTML = "";
+            document.getElementById("cert-root").innerHTML = `
+               <button style="border: none; background-color: white; margin: 10px;" id="in-course-back-btn"> 
+               <img width=30 src="https://sliquid.com/wp-content/uploads/2024/03/left-arrow-back-button-back-arrow-icon-vector.jpg"/> </button>
+               <h1 style="display: flex; justify-content: center; font-weight: 100;"> ${titles[j]} </h1>
+               <p style="display: flex; justify-content: center;"> course ${i} </p>
+               <div style="position: relative; overflow: hidden; padding-top: 56.25%;">
+               <iframe src="https://share.synthesia.io/embeds/videos/9c3a1cff-4932-4cd8-9894-a8ecc5b1f814" loading="lazy" title="Synthesia video player 
+               - Your AI video" allow="encrypted-media; fullscreen;" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0; margin: 0; overflow:hidden;"></iframe></div>
+               `;
+            break;
+            return;
+          }
+          case "lessons": {
+            document.getElementById("cert-root").innerHTML = "";
+            document.getElementById(
+              "cert-root"
+            ).innerHTML = ` <button style="border: none; background-color: white; margin: 10px;" id="back-btn"> 
+              <img width=30 src="https://sliquid.com/wp-content/uploads/2024/03/left-arrow-back-button-back-arrow-icon-vector.jpg"/> </button>`;
+            let j = cindex;
+            if (!(category === "")) {
+              switch (category) {
+                case "naturals": {
+                  j = 0;
+                  break;
+                }
+                case "organics": {
+                  j = 1;
+                  break;
+                }
+                case "balance": {
+                  j = 2;
+                  break;
+                }
+                case "misc": {
+                  j = 3;
+                  break;
+                }
+              }
+            }
+            for (let i = 0; i < lessonsAmount[j]; i++) {
+              document.getElementById(
+                "cert-root"
+              ).innerHTML += `<p id="pcourse-${i}-${j}" 
+              style="cursor: pointer; border: solid 1px grey; padding: 8px; border-radius: 2px; margin: 0px;"> course ${i} </p>`;
+            }
+            document
+              .getElementById("back-btn")
+              .addEventListener("click", () => {
+                document.getElementById("courses-div").style.display = "flex";
+                document.getElementById("cert-root").innerHTML = "";
+                render("courses");
+                activeEventHandlers();
+              });
+            for (let i = 0; i < lessonsAmount[j]; i++) {
+              document
+                .getElementById(`pcourse-${i}-${j}`)
+                .addEventListener("click", () => {
+                  render("incourse", "", j, i);
+                  render("questions", "", j, i);
+                  for (let k = 0; k < 4; k++) {
+                    document
+                      .getElementById(`q-${j}-${i}-${k}`)
+                      .addEventListener("click", (e) => {
+                        currrentAnswer = e.target.value;
+                        alert(currrentAnswer);
+                      });
+                  }
+                  document
+                    .getElementById("in-course-back-btn")
+                    .addEventListener("click", () => {
+                      document.getElementById("cert-root").innerHTML = "";
+                      document.getElementById(
+                        "cert-root"
+                      ).innerHTML = `<button style="border: none; background-color: white; margin: 10px;" id="back-btn"> <img width=30
+                                src="https://sliquid.com/wp-content/uploads/2024/03/left-arrow-back-button-back-arrow-icon-vector.jpg"/> </button>`;
+                      render(
+                        "lessons",
+                        localStorage.getItem("currentCourse"),
+                        j
+                      );
+                    });
+                });
+            }
+            break;
+            return;
+          }
+          case "questions": {
+            let j = cindex;
+            let i = iindex;
+            for (let k = 0; k < 4; k++) {
+              document.getElementById("cert-root").innerHTML += `
+                <input id="q-${j}-${i}-${k}" type="radio" value="q-${j}-${i}-${k}">
+                <label for="q-${j}-${i}-${k}"> ${questions[j][i][k]} </label><br>`;
+            }
+          }
+        }
+      };
+    </script>
+
+    <script>
+      let questions = [
+        [
+          ["question", "question", "question", "question"],
+          ["question", "question", "question", "question"],
+          ["question", "question", "question", "question"],
+          ["question", "question", "question", "question"],
+          ["question", "question", "question", "question"],
+          ["question", "question", "question", "question"],
+          ["question", "question", "question", "question"],
+          ["question", "question", "question", "question"],
+          ["question", "question", "question", "question"],
+          ["question", "question", "question", "question"],
+        ],
+        [],
+        [],
+        [],
+      ];
+      let picsSrc = [
+        "https://sliquid.com/wp-content/uploads/2021/11/website-squares-natural-1-scaled.jpg",
+        "https://sliquid.com/wp-content/uploads/2024/03/Sliquid-Organics-Oceanics-St.-Patricks-Day-Product-Image-Square.jpg",
+        "https://sliquid.com/wp-content/uploads/2024/03/Sliquid-Balance-Massage-Tropical-Product-Image-Square.jpg",
+        "https://sliquid.com/wp-content/uploads/2024/02/336673325_753526522830510_5715382204977414408_n-1.jpg",
+      ];
+      const titles = ["naturals", "organics", "balance", "misc"];
+      const lessonsAmount = ["23", "18", "21", "8"];
+      const times = ["", "", "", ""];
+      const descriptions = [
+        "learns about the naturals line",
+        "learn about the organics line",
+        "learn about the balance line",
+        "other",
+      ];
+      function hash(string) {
+        let tmp = "";
+        for (let j = 0; j < string.length; j++) {
+          let charc = string.charCodeAt(j);
+          tmp += charc * j + 1;
+        }
+        return tmp;
+      }
+      let authKey = 0;
+      if (localStorage.getItem("name")) {
+        if (
+          localStorage.getItem("quizAuth") ==
+          hash(localStorage.getItem("name")) +
+            hash(localStorage.getItem("email"))
+        ) {
+          if (localStorage.getItem("currentLocation")) {
+            switch (localStorage.getItem("currentLocation")) {
+              case "home": {
+                render("init");
+                render("courses");
+                activeEventHandlers();
+                break;
+              }
+              case "incourse": {
+                alert("rendering incourse");
+                break;
+              }
+              case "lessons": {
+                render("init");
+                let j = 0;
+                let curCour = localStorage.getItem("currentCourse");
+                if (curCour) {
+                  switch (curCour) {
+                    case "naturals": {
+                      j = 0;
+                      break;
+                    }
+                    case "organics": {
+                      j = 1;
+                      break;
+                    }
+                    case "balance": {
+                      j = 2;
+                      break;
+                    }
+                    case "misc": {
+                      j = 3;
+                      break;
+                    }
+                  }
+                }
+                render("lessons", localStorage.getItem("currentCourse"), j);
+                subActiveEventHandlers(j);
+                break;
+              }
+            }
+          }
+          let currrentAnswer = "";
+        }
+      }
+      let email = "";
+      let name = "";
+      document
+        .getElementById("quiz-email-input")
+        .addEventListener("keyup", (e) => {
+          email = e.target.value;
+        });
+      document
+        .getElementById("quiz-name-input")
+        .addEventListener("keyup", (e) => {
+          name = e.target.value;
+        });
+      document.getElementById("quiz-submit").addEventListener("click", (e) => {
+        if (name.length < 2) {
+          if (email.length < 6) {
+            alert("email and name too short");
+            return;
+          }
+          alert("name too short");
+          return;
+        }
+        if (email.length < 6) {
+          if (name.length < 2) {
+            alert("email and name too short");
+            return;
+          }
+          alert("email too short to be valid");
+          return;
+        }
+        authKey = hash(name) + hash(email);
+        localStorage.setItem("name", name);
+        localStorage.setItem("email", email);
+        localStorage.setItem("quizAuth", authKey);
+        document.getElementById("quiz-info-div").style.display = "none";
+        document.getElementById("courses-div").style.display = "flex";
+        location.reload();
+      });
+    </script>
+  </body>
+</html>
+<style>
+  #cert-top-div h3 {
+    transition: 0.1s;
+    margin: 0px !important;
+    padding: 25px !important;
+  }
+  #cert-top-div h3:hover {
+    border-bottom: solid 2px #00a2e1;
+  }
+  .course-con {
+    transition: 0.2s;
+  }
+  .course-con:hover {
+    transform: scale(1.06);
+  }
+  @keyframes fadein {
+    from {
+      transform: scale(10.5);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  #lesson-div-0 {
+    animation: fadein 0.5s ease-out 0.1s;
+  }
+  #lesson-div-1 {
+    animation: fadein 0.5s ease-out 0.2s;
+  }
+  #lesson-div-2 {
+    animation: fadein 0.5s ease-out 0.3s;
+  }
+  #lesson-div-3 {
+    animation: fadein 0.5s ease-out 0.4s;
+  }
+</style>
