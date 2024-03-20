@@ -14,17 +14,23 @@
         sans-serif;
     "
   >
+  <!-- Where Nav is rendered -->
     <div
       style="display: flex; justify-content: center; padding: 0px; margin: 0px"
       id="cert-top-div"
     ></div>
-    <div id="cert-root"></div>
 
+  <!-- Root Node -->
+    <div id="cert-root"></div>
+  <!-- Root Node -->
+
+  <!-- Just something I render to for the home page. May be fazed out in the future -->
     <div
       id="courses-div"
       style="display: none; justify-content: center; flex-direction: row"
     ></div>
 
+    <!-- Only for login page, disapears when authenticated -->
     <div
       id="quiz-info-div"
       style="display: flex; justify-content: center; margin: 50px"
@@ -59,14 +65,69 @@
 
     <!-- MANUAL CONFIG -->
     <script>
+      // singleton instance of the Course class, just for data origanization
+      class Course {
+        collections = [
+          [
+            "Naturals Collection",
+            "h2o",
+            "Sassy",
+            "Silk",
+            "Sea",
+            "Satin",
+            "Sizzle",
+            "Swirl",
+            "Sparkle",
+            "Summary",
+          ],
+          [],
+          [],
+          [],
+        ];
+        questions = [
+          [
+            ["question", "question", "question", "question"],
+            ["question", "question", "question", "question"],
+            ["question", "question", "question", "question"],
+            ["question", "question", "question", "question"],
+            ["question", "question", "question", "question"],
+            ["question", "question", "question", "question"],
+            ["question", "question", "question", "question"],
+            ["question", "question", "question", "question"],
+            ["question", "question", "question", "question"],
+            ["question", "question", "question", "question"],
+          ],
+          [],
+          [],
+          [],
+        ];
+        picsSrc = [
+          "https://sliquid.com/wp-content/uploads/2021/11/website-squares-natural-1-scaled.jpg",
+          "https://sliquid.com/wp-content/uploads/2024/03/Sliquid-Organics-Oceanics-St.-Patricks-Day-Product-Image-Square.jpg",
+          "https://sliquid.com/wp-content/uploads/2024/03/Sliquid-Balance-Massage-Tropical-Product-Image-Square.jpg",
+          "https://sliquid.com/wp-content/uploads/2024/02/336673325_753526522830510_5715382204977414408_n-1.jpg",
+        ];
+        titles = ["naturals", "organics", "balance", "misc"];
+        lessonsAmount = ["10", "18", "21", "8"];
+        times = ["", "", "", ""];
+        descriptions = [
+          "learns about the naturals line",
+          "learn about the organics line",
+          "learn about the balance line",
+          "other",
+        ];
+      }
+      const MainCourse = new Course();
       localStorage.setItem("currentLocation", "lessons");
       localStorage.setItem("currentCourse", "naturals");
     </script>
     <!-- FUNCTIONS -->
     <script>
+      // since this software is run on a "render" basis, when we wipe the dom and re render by interpolationing HTML into the dom rootnode "cert-root" events are whiped
+      // so we have these nested callbacks that re enable events to the dom
       const subActiveEventHandlers = (j) => {
         (() => {
-          for (let i = 0; i < lessonsAmount[j]; i++) {
+          for (let i = 0; i < MainCourse.lessonsAmount[j]; i++) {
             document
               .getElementById(`pcourse-${i}-${j}`)
               .addEventListener("click", () => {
@@ -109,7 +170,7 @@
               .getElementById(`lesson-div-${j}`)
               .addEventListener("click", (e) => {
                 render("lessons", "", j, 0);
-                for (let i = 0; i < lessonsAmount[j]; i++) {
+                for (let i = 0; i < MainCourse.lessonsAmount[j]; i++) {
                   document
                     .getElementById(`pcourse-${i}-${j}`)
                     .addEventListener("click", () => {
@@ -147,7 +208,9 @@
           })();
         }
       };
-
+      // this is the main function, it can usually just take a string and will render HTML to the cert root via that input
+      // or more specific index params for certain nested actions to determine which category or lesson you're in
+      // makes for dynamic "single page feel" by rendering to a root, although events can probably be re worked so: TODO
       const render = (renderString, category, cindex, iindex) => {
         switch (renderString) {
           case "init": {
@@ -171,14 +234,14 @@
               document.getElementById("courses-div").innerHTML += `
             <div id="lesson-div-${i}" style="display: flex; justify-content: center;">
                 <div class="course-con" style="box-shadow: 5px 5px 28px rgb(210 210 210); border-radius: 5px; margin: 20px; cursor: pointer">
-                  <img style="border-radius: 5px 5px 0px 0px" src="${picsSrc[i]}" width=300 />
+                  <img style="border-radius: 5px 5px 0px 0px" src="${MainCourse.picsSrc[i]}" width=300 />
                   <div style="width: 100%;  display: flex; justify-content: center; flex-direction: column;">
-                    <h2 style="display: flex; justify-content: center; font-weight: 100; color: grey;"> ${titles[i]} </h2>
-                    <h3 style="display: flex; justify-content: center; font-weight: 300; color: rgb(85 85 85)"> ${descriptions[i]}</h3>
+                    <h2 style="display: flex; justify-content: center; font-weight: 100; color: grey;"> ${MainCourse.titles[i]} </h2>
+                    <h3 style="display: flex; justify-content: center; font-weight: 300; color: rgb(85 85 85)"> ${MainCourse.descriptions[i]}</h3>
                       <div style="display: flex; justify-content: center; gap: 40px">
                         <div style="display: flex;">
                           <img width=45 height=45 src="https://sliquid.com/wp-content/uploads/2024/03/360_F_163489083_ePjmcRDlTr9qi2Et08f0J001vp5YZuW4.jpg"/>
-                          <p style="color: #00a2e1;"> ${lessonsAmount[i]} lessons </p>
+                          <p style="color: #00a2e1;"> ${MainCourse.lessonsAmount[i]} lessons </p>
                         </div>
                         <div style="display: flex;">
                           <img width=45 height=45 src="https://sliquid.com/wp-content/uploads/2024/03/360_F_529739662_yRW6APsQg3PaJGQ6afQL8hDdod0OR1re.jpg" />
@@ -220,7 +283,7 @@
             document.getElementById("cert-root").innerHTML = `
                <button style="border: none; background-color: white; margin: 10px;" id="in-course-back-btn"> 
                <img width=30 src="https://sliquid.com/wp-content/uploads/2024/03/left-arrow-back-button-back-arrow-icon-vector.jpg"/> </button>
-               <h1 style="display: flex; justify-content: center; font-weight: 100;"> ${titles[j]} </h1>
+               <h1 style="display: flex; justify-content: center; font-weight: 100;"> ${MainCourse.titles[j]} </h1>
                <p style="display: flex; justify-content: center;"> course ${i} </p>
                <div style="position: relative; overflow: hidden; padding-top: 56.25%;">
                <iframe src="https://share.synthesia.io/embeds/videos/9c3a1cff-4932-4cd8-9894-a8ecc5b1f814" loading="lazy" title="Synthesia video player 
@@ -234,7 +297,9 @@
             document.getElementById(
               "cert-root"
             ).innerHTML = ` <button style="border: none; background-color: white; margin: 10px;" id="back-btn"> 
-              <img width=30 src="https://sliquid.com/wp-content/uploads/2024/03/left-arrow-back-button-back-arrow-icon-vector.jpg"/> </button>`;
+              <img width=30 src="https://sliquid.com/wp-content/uploads/2024/03/left-arrow-back-button-back-arrow-icon-vector.jpg"/> </button>
+
+              `;
             let j = cindex;
             if (!(category === "")) {
               switch (category) {
@@ -256,11 +321,15 @@
                 }
               }
             }
-            for (let i = 0; i < lessonsAmount[j]; i++) {
-              document.getElementById(
-                "cert-root"
-              ).innerHTML += `<p id="pcourse-${i}-${j}" 
-              style="cursor: pointer; border: solid 1px grey; padding: 8px; border-radius: 2px; margin: 0px;"> course ${i} </p>`;
+            for (let i = 0; i < MainCourse.lessonsAmount[j]; i++) {
+              document.getElementById("cert-root").innerHTML += `
+              <div style="display: flex; justify-content: center;">
+              <div style="display: flex; justify-content: center; border: solid 1px grey; border-radius: 5px; width: 90%; padding: 8px; margin: 10px;">
+              <p id="pcourse-${i}-${j}" style="cursor: pointer; border-radius: 2px; width: 70%;"> Sliquid Naturals ${MainCourse.collections[j][i]}</p>
+              <button style="background-color: #00a2e1; color: white; font-weight: 1000; border: none; width: 30%; border-radius: 5px;"> begin lesson </button>
+              </div>
+              </div>
+              `;
             }
             document
               .getElementById("back-btn")
@@ -270,7 +339,7 @@
                 render("courses");
                 activeEventHandlers();
               });
-            for (let i = 0; i < lessonsAmount[j]; i++) {
+            for (let i = 0; i < MainCourse.lessonsAmount[j]; i++) {
               document
                 .getElementById(`pcourse-${i}-${j}`)
                 .addEventListener("click", () => {
@@ -309,7 +378,7 @@
             for (let k = 0; k < 4; k++) {
               document.getElementById("cert-root").innerHTML += `
                 <input id="q-${j}-${i}-${k}" type="radio" value="q-${j}-${i}-${k}">
-                <label for="q-${j}-${i}-${k}"> ${questions[j][i][k]} </label><br>`;
+                <label for="q-${j}-${i}-${k}"> ${MainCourse.questions[j][i][k]} </label><br>`;
             }
           }
         }
@@ -317,38 +386,6 @@
     </script>
 
     <script>
-      let questions = [
-        [
-          ["question", "question", "question", "question"],
-          ["question", "question", "question", "question"],
-          ["question", "question", "question", "question"],
-          ["question", "question", "question", "question"],
-          ["question", "question", "question", "question"],
-          ["question", "question", "question", "question"],
-          ["question", "question", "question", "question"],
-          ["question", "question", "question", "question"],
-          ["question", "question", "question", "question"],
-          ["question", "question", "question", "question"],
-        ],
-        [],
-        [],
-        [],
-      ];
-      let picsSrc = [
-        "https://sliquid.com/wp-content/uploads/2021/11/website-squares-natural-1-scaled.jpg",
-        "https://sliquid.com/wp-content/uploads/2024/03/Sliquid-Organics-Oceanics-St.-Patricks-Day-Product-Image-Square.jpg",
-        "https://sliquid.com/wp-content/uploads/2024/03/Sliquid-Balance-Massage-Tropical-Product-Image-Square.jpg",
-        "https://sliquid.com/wp-content/uploads/2024/02/336673325_753526522830510_5715382204977414408_n-1.jpg",
-      ];
-      const titles = ["naturals", "organics", "balance", "misc"];
-      const lessonsAmount = ["23", "18", "21", "8"];
-      const times = ["", "", "", ""];
-      const descriptions = [
-        "learns about the naturals line",
-        "learn about the organics line",
-        "learn about the balance line",
-        "other",
-      ];
       function hash(string) {
         let tmp = "";
         for (let j = 0; j < string.length; j++) {
@@ -357,6 +394,8 @@
         }
         return tmp;
       }
+      // where the basic authentication happens, which upon passing will check the users current page location thats stored and will
+      // render accordingly. This happens everypage load so users page will persist through loads despite being a false single page application
       let authKey = 0;
       if (localStorage.getItem("name")) {
         if (
