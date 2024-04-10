@@ -14,17 +14,18 @@
         sans-serif;
     "
   >
-  <!-- Where Nav is rendered -->
+    <div id="grid"></div>
+    <!-- Where Nav is rendered -->
     <div
       style="display: flex; justify-content: center; padding: 0px; margin: 0px"
       id="cert-top-div"
     ></div>
 
-  <!-- Root Node -->
+    <!-- Root Node -->
     <div id="cert-root"></div>
-  <!-- Root Node -->
+    <!-- Root Node -->
 
-  <!-- Just something I render to for the home page. May be fazed out in the future -->
+    <!-- Just something I render to for the home page. May be fazed out in the future -->
     <div
       id="courses-div"
       style="display: none; justify-content: center; flex-direction: row"
@@ -63,29 +64,99 @@
       </div>
     </div>
 
+    <script>
+      // for (let i = 0; i < 30; i++) {
+      //   for (let j = 0; j < 30; j++) {
+      //     document.getElementById("grid").innerHTML += `
+      // <div id=${i}-${j} style="padding: 4.8px; position: absolute; top: ${
+      //       i * 10 + 100
+      //     }px; left: ${j * 10 + 100}px;"> </div>
+      // `;
+      //   }
+      // }
+      // let rainbow = 0;
+      // rainbow = 0;
+      // setInterval(() => {
+      //   for (let i = 0; i < 30; i++) {
+      //     for (let j = 0; j < 30; j++) {
+      //       rainbow += 0.215 + 0.008;
+      //       document.getElementById(`${i}-${j}`).style.backgroundColor = `rgb(
+      //           ${Math.sin(rainbow) * 250}
+      //           20
+      //           20
+      //         )`;
+      //       document.getElementById(`${i}-${j}`).style.transform = `scale(${
+      //         Math.sin(rainbow) + 1.25 * 1.6
+      //       })`;
+      //       document
+      //         .getElementById(`${i}-${j}`)
+      //         .addEventListener("mousemove", (e) => {
+      //           document.getElementById(
+      //             `${i}-${j}`
+      //           ).style.backgroundColor = `rgb(0 ${rainbow} ${Math.sin(
+      //             rainbow
+      //           )} )`;
+      //         });
+      //     }
+      //   }
+      // }, 60);
+    </script>
+
     <!-- MANUAL CONFIG -->
     <script>
-      // singleton instance of the Course class, just for data origanization
+      class Test {
+        returnSelf = () => {
+          return this;
+        };
+      }
+      class Question {
+        question = "question";
+        answered = false;
+      }
+      class Collection {
+        collectionName = "";
+        done = false;
+        constructor(nameString) {
+          this.collectionName = nameString;
+        }
+      }
       class Course {
+        completedArray = [false, false, false, false];
         collections = [
           [
-            "Naturals Collection",
-            "h2o",
-            "Sassy",
-            "Silk",
-            "Sea",
-            "Satin",
-            "Sizzle",
-            "Swirl",
-            "Sparkle",
-            "Summary",
+            new Collection("Collection"),
+            new Collection("h2o"),
+            new Collection("Sassy"),
+            new Collection("Silk"),
+            new Collection("Sea"),
+            new Collection("Satin"),
+            new Collection("Sizzle"),
+            new Collection("Swirl"),
+            new Collection("Sparkle"),
+            new Collection("Summary"),
           ],
-          [],
-          [],
+          [
+            new Collection("Natural"),
+            new Collection("Natural Gel"),
+            new Collection("Oceanics"),
+            new Collection("Silk"),
+            new Collection("Sensation"),
+            new Collection("O Gel"),
+            new Collection("Summary"),
+          ],
+          [
+            new Collection("Soak"),
+            new Collection("Splash"),
+            new Collection("Smooth"),
+            new Collection("Soothe"),
+            new Collection("Message Oils"),
+            new Collection("Summary"),
+          ],
           [],
         ];
         questions = [
           [
+            // Naturals
             ["question", "question", "question", "question"],
             ["question", "question", "question", "question"],
             ["question", "question", "question", "question"],
@@ -97,7 +168,10 @@
             ["question", "question", "question", "question"],
             ["question", "question", "question", "question"],
           ],
-          [],
+          [
+            // Organics
+            ["question", "question", "question", "question"],
+          ],
           [],
           [],
         ];
@@ -108,7 +182,7 @@
           "https://sliquid.com/wp-content/uploads/2024/02/336673325_753526522830510_5715382204977414408_n-1.jpg",
         ];
         titles = ["naturals", "organics", "balance", "misc"];
-        lessonsAmount = ["10", "18", "21", "8"];
+        lessonsAmount = ["10", "7", "6", "8"];
         times = ["", "", "", ""];
         descriptions = [
           "learns about the naturals line",
@@ -117,9 +191,14 @@
           "other",
         ];
       }
-      const MainCourse = new Course();
-      localStorage.setItem("currentLocation", "lessons");
+      localStorage.setItem("currentLocation", "home");
       localStorage.setItem("currentCourse", "naturals");
+      let User;
+      if (localStorage.getItem("User")) {
+        User = {
+          main: JSON.parse(localStorage.getItem("User")),
+        };
+      }
     </script>
     <!-- FUNCTIONS -->
     <script>
@@ -170,7 +249,11 @@
               .getElementById(`lesson-div-${j}`)
               .addEventListener("click", (e) => {
                 render("lessons", "", j, 0);
-                for (let i = 0; i < MainCourse.lessonsAmount[j]; i++) {
+                for (
+                  let i = 0;
+                  i < User.main.course.data.lessonsAmount[j];
+                  i++
+                ) {
                   document
                     .getElementById(`pcourse-${i}-${j}`)
                     .addEventListener("click", () => {
@@ -231,7 +314,30 @@
           case "courses": {
             document.getElementById("courses-div").innerHTML = "";
             for (let i = 0; i < 4; i++) {
-              document.getElementById("courses-div").innerHTML += `
+              document.getElementById("courses-div").innerHTML += User.main
+                .course.data.completedArray[i]
+                ? `
+            <div id="lesson-div-${i}" style="display: flex; justify-content: center;">
+                <div class="course-con" style="box-shadow: 5px 5px 28px rgb(210 210 210); border-radius: 5px; margin: 20px; cursor: pointer">
+                  <img style="border-radius: 5px 5px 0px 0px" src="${MainCourse.picsSrc[i]}" width=300 />
+                  <div style="width: 100%;  display: flex; justify-content: center; flex-direction: column;">
+                    <h2 style="display: flex; justify-content: center; font-weight: 100; color: grey;"> ${MainCourse.titles[i]} </h2>
+                    <h3 style="display: flex; justify-content: center; font-weight: 300; color: rgb(85 85 85)"> ${MainCourse.descriptions[i]}</h3>
+                      <div style="display: flex; justify-content: center; gap: 40px">
+                        <div style="display: flex;">
+                          <img width=45 height=45 src="https://sliquid.com/wp-content/uploads/2024/03/360_F_163489083_ePjmcRDlTr9qi2Et08f0J001vp5YZuW4.jpg"/>
+                          <p style="color: #00a2e1;"> ${MainCourse.lessonsAmount[i]} lessons </p>
+                        </div>
+                        <div style="display: flex;">
+                          <img width=45 height=45 src="https://sliquid.com/wp-content/uploads/2024/03/360_F_529739662_yRW6APsQg3PaJGQ6afQL8hDdod0OR1re.jpg" />
+                         <p style="color: #00a2e1;"> done </p>
+                        </div>
+                      </div>
+                  </div>
+                </div>
+            </div>
+                `
+                : `
             <div id="lesson-div-${i}" style="display: flex; justify-content: center;">
                 <div class="course-con" style="box-shadow: 5px 5px 28px rgb(210 210 210); border-radius: 5px; margin: 20px; cursor: pointer">
                   <img style="border-radius: 5px 5px 0px 0px" src="${MainCourse.picsSrc[i]}" width=300 />
@@ -301,6 +407,25 @@
 
               `;
             let j = cindex;
+            let currentC = "";
+            switch (j) {
+              case 0: {
+                currentC = "Naturals";
+                break;
+              }
+              case 1: {
+                currentC = "Organics";
+                break;
+              }
+              case 2: {
+                currentC = "Balance";
+                break;
+              }
+              case 3: {
+                currentC = "Misc";
+                break;
+              }
+            }
             if (!(category === "")) {
               switch (category) {
                 case "naturals": {
@@ -325,8 +450,18 @@
               document.getElementById("cert-root").innerHTML += `
               <div style="display: flex; justify-content: center;">
               <div style="display: flex; justify-content: center; border: solid 1px grey; border-radius: 5px; width: 90%; padding: 8px; margin: 10px;">
-              <p id="pcourse-${i}-${j}" style="cursor: pointer; border-radius: 2px; width: 70%;"> Sliquid Naturals ${MainCourse.collections[j][i]}</p>
+                   <p id="pcourse-${i}-${j}" style="cursor: pointer; border-radius: 2px; width: 70%;"> Sliquid ${currentC} ${
+                MainCourse.collections[j][i].collectionName
+              }</p>
+              ${
+                !User.main.course.data.collections[j][i].done
+                  ? `
               <button style="background-color: #00a2e1; color: white; font-weight: 1000; border: none; width: 30%; border-radius: 5px;"> begin lesson </button>
+                  `
+                  : `
+              <button style="background-color: grey; color: white; font-weight: 1000; border: none; width: 30%; border-radius: 5px;"> finished </button>
+                  `
+              }
               </div>
               </div>
               `;
@@ -396,13 +531,29 @@
       }
       // where the basic authentication happens, which upon passing will check the users current page location thats stored and will
       // render accordingly. This happens everypage load so users page will persist through loads despite being a false single page application
+      class Lesson {
+        done = false;
+      }
       let authKey = 0;
+      // singleton instance of the Course class, just for data origanization
+      const MainCourse = new Course();
       if (localStorage.getItem("name")) {
         if (
           localStorage.getItem("quizAuth") ==
           hash(localStorage.getItem("name")) +
             hash(localStorage.getItem("email"))
         ) {
+          if (!localStorage.getItem("firstLog")) {
+            User = {
+              name: localStorage.getItem("name"),
+              email: localStorage.getItem("email"),
+              course: {
+                data: MainCourse,
+              },
+            };
+            localStorage.setItem("User", JSON.stringify(User));
+          }
+          localStorage.setItem("firstLog", true);
           if (localStorage.getItem("currentLocation")) {
             switch (localStorage.getItem("currentLocation")) {
               case "home": {
@@ -477,6 +628,15 @@
           alert("email too short to be valid");
           return;
         }
+
+        User = {
+          name: localStorage.getItem("name"),
+          email: localStorage.getItem("email"),
+          course: {
+            data: MainCourse,
+          },
+        };
+        localStorage.setItem("User", JSON.stringify(User));
         authKey = hash(name) + hash(email);
         localStorage.setItem("name", name);
         localStorage.setItem("email", email);
