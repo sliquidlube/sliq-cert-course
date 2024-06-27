@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Hello, world!</title>
+    <title>Sliquid</title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="description" content="" />
     <link rel="icon" href="favicon.png" />
@@ -101,9 +101,9 @@
       //   }
       // }, 60);
     </script>
-
     <!-- MANUAL CONFIG -->
     <script>
+      // Classes
       class Test {
         returnSelf = () => {
           return this;
@@ -191,106 +191,234 @@
           "other",
         ];
       }
-      localStorage.setItem("currentLocation", "home");
-      localStorage.setItem("currentCourse", "naturals");
       let User;
       if (localStorage.getItem("User")) {
-        User = {
-          main: JSON.parse(localStorage.getItem("User")),
-        };
+        User = JSON.parse(localStorage.getItem("User"));
+        // User = {
+        //   main: JSON.parse(localStorage.getItem("User")),
+        // };
       }
     </script>
     <!-- FUNCTIONS -->
     <script>
+      const whipeDom = () => {
+        document.getElementById("cert-root").innerHTML = "";
+        document.getElementById("courses-div").innerHTML = "";
+      };
       // since this software is run on a "render" basis, when we wipe the dom and re render by interpolationing HTML into the dom rootnode "cert-root" events are whiped
       // so we have these nested callbacks that re enable events to the dom
-      const subActiveEventHandlers = (j) => {
-        (() => {
-          for (let i = 0; i < MainCourse.lessonsAmount[j]; i++) {
-            document
-              .getElementById(`pcourse-${i}-${j}`)
-              .addEventListener("click", () => {
-                render("incourse", "", j, i);
-                render("questions", "", j, i);
-                for (let k = 0; k < 4; k++) {
-                  document
-                    .getElementById(`q-${j}-${i}-${k}`)
-                    .addEventListener("click", (e) => {
-                      currrentAnswer = e.target.value;
-                      alert(currrentAnswer);
-                    });
-                }
-                document
-                  .getElementById("in-course-back-btn")
-                  .addEventListener("click", () => {
-                    document.getElementById("cert-root").innerHTML = "";
-                    document.getElementById(
-                      "cert-root"
-                    ).innerHTML = `<button style="border: none; background-color: white; margin: 10px;" id="back-btn"> <img width=30
-                                src="https://sliquid.com/wp-content/uploads/2024/03/left-arrow-back-button-back-arrow-icon-vector.jpg"/> </button>`;
-                    render("lessons", localStorage.getItem("currentCourse"), j);
-                  });
-              });
-          }
-          document.getElementById("courses-div").style.display = "none";
-          document.getElementById("back-btn").addEventListener("click", () => {
-            document.getElementById("courses-div").style.display = "flex";
-            document.getElementById("cert-root").innerHTML = "";
-            render("courses");
+      // ill think of a better way to do this
+      const activeEventHandlers = () => {
+        document.getElementById("home-btn").addEventListener("click", () => {
+          localStorage.setItem("currentLocation", "home");
+          whipeDom();
+          render("init");
+          render("courses");
+          activeEventHandlers();
+        });
+        document.getElementById("courses-btn").addEventListener("click", () => {
+          render("courses");
+          activeEventHandlers();
+        });
+        document
+          .getElementById("completed-btn")
+          .addEventListener("click", () => {
+            whipeDom();
+            document.getElementById("courses-div").style.display = "block";
+            for (let i = 0; i < 4; i++) {
+              if (User.course.data.completedArray[i]) {
+                document.getElementById("courses-div").innerHTML += `
+              <div id="lesson-div-${i}" style="filter: grayscale(1); display: flex; justify-content: center;">
+                <div class="course-con" style="box-shadow: 5px 5px 28px rgb(210 210 210); border-radius: 5px; margin: 20px; cursor: pointer">
+                  <img style="border-radius: 5px 5px 0px 0px" src="${MainCourse.picsSrc[i]}" width=300 />
+                  <div style="width: 100%;  display: flex; justify-content: center; flex-direction: column;">
+                    <h2 style="display: flex; justify-content: center; font-weight: 100; color: grey;"> ${MainCourse.titles[i]} </h2>
+                    <h3 style="display: flex; justify-content: center; font-weight: 300; color: rgb(85 85 85)"> ${MainCourse.descriptions[i]}</h3>
+                      <div style="display: flex; justify-content: center; gap: 40px">
+                        <div style="display: flex;">
+                          <img width=45 height=45 src="https://sliquid.com/wp-content/uploads/2024/03/360_F_163489083_ePjmcRDlTr9qi2Et08f0J001vp5YZuW4.jpg"/>
+                          <p style="color: #00a2e1;"> complete </p>
+                        </div>
+                        <div style="display: flex;">
+                          <img width=45 height=45 src="https://sliquid.com/wp-content/uploads/2024/03/360_F_529739662_yRW6APsQg3PaJGQ6afQL8hDdod0OR1re.jpg" />
+                         <p style="color: #00a2e1;"> 0 </p>
+                        </div>
+                      </div>
+                  </div>
+                </div>
+            </div>
+          `;
+              }
+            }
             activeEventHandlers();
           });
-        })();
-      };
-
-      const activeEventHandlers = () => {
         for (let j = 0; j < 4; j++) {
           (() => {
-            document
-              .getElementById(`lesson-div-${j}`)
-              .addEventListener("click", (e) => {
-                render("lessons", "", j, 0);
-                for (
-                  let i = 0;
-                  i < User.main.course.data.lessonsAmount[j];
-                  i++
-                ) {
-                  document
-                    .getElementById(`pcourse-${i}-${j}`)
-                    .addEventListener("click", () => {
-                      render("incourse", "", j, i);
-                      render("questions", "", j, i);
-                      for (let k = 0; k < 4; k++) {
+            if (!User.course.data.completedArray[j]) {
+              document
+                .getElementById(`lesson-div-${j}`)
+                .addEventListener("click", (e) => {
+                  localStorage.setItem("currentLocation", "lessons");
+                  switch (j) {
+                    case 0: {
+                      localStorage.setItem("currentCourse", "naturals");
+                      break;
+                    }
+                    case 1: {
+                      localStorage.setItem("currentCourse", "organics");
+                      break;
+                    }
+                    case 2: {
+                      localStorage.setItem("currentCourse", "balance");
+                      break;
+                    }
+                    case 3: {
+                      localStorage.setItem("currentCourse", "misc");
+                      break;
+                    }
+                  }
+                  render("lessons", "", j, 0);
+                  for (let i = 0; i < User.course.data.lessonsAmount[j]; i++) {
+                    document
+                      .getElementById(`pcourse-${i}-${j}`)
+                      .addEventListener("click", () => {
+                        localStorage.setItem("currentLocation", "incourse");
+                        localStorage.setItem("inlessonj", j);
+                        localStorage.setItem("inlessoni", i);
+                        render("incourse", "", j, i);
+                        render("questions", "", j, i);
+                        for (let k = 0; k < 4; k++) {
+                          document
+                            .getElementById(`q-${j}-${i}-${k}`)
+                            .addEventListener("click", (e) => {
+                              currrentAnswer = e.target.value;
+                              alert(currrentAnswer);
+                            });
+                        }
                         document
-                          .getElementById(`q-${j}-${i}-${k}`)
-                          .addEventListener("click", (e) => {
-                            currrentAnswer = e.target.value;
-                            alert(currrentAnswer);
+                          .getElementById("in-course-back-btn")
+                          .addEventListener("click", () => {
+                            localStorage.setItem("currentLocation", "lessons");
+                            document.getElementById("cert-root").innerHTML = "";
+                            document.getElementById(
+                              "cert-root"
+                            ).innerHTML = `<button style="border: none; background-color: white; margin: 10px;" id="back-btn"> <img width=30
+                            src="https://sliquid.com/wp-content/uploads/2024/03/left-arrow-back-button-back-arrow-icon-vector.jpg"/> </button>`;
+                            render("lessons", "", j);
                           });
-                      }
-                      document
-                        .getElementById("in-course-back-btn")
-                        .addEventListener("click", () => {
-                          document.getElementById("cert-root").innerHTML = "";
-                          document.getElementById(
-                            "cert-root"
-                          ).innerHTML = `<button style="border: none; background-color: white; margin: 10px;" id="back-btn"> <img width=30
-                                src="https://sliquid.com/wp-content/uploads/2024/03/left-arrow-back-button-back-arrow-icon-vector.jpg"/> </button>`;
-                          render("lessons", "", j);
-                        });
+                      });
+                  }
+
+                  document.getElementById("courses-div").style.display = "none";
+                  document
+                    .getElementById("back-btn")
+                    .addEventListener("click", () => {
+                      localStorage.setItem("currentLocation", "home");
+                      document.getElementById("courses-div").style.display =
+                        "flex";
+                      document.getElementById("cert-root").innerHTML = "";
+                      render("courses");
+                      activeEventHandlers();
                     });
-                }
-                document.getElementById("courses-div").style.display = "none";
-                document
-                  .getElementById("back-btn")
-                  .addEventListener("click", () => {
-                    document.getElementById("courses-div").style.display =
-                      "flex";
-                    document.getElementById("cert-root").innerHTML = "";
-                  });
-              });
+                });
+            }
           })();
         }
       };
+
+      const subActiveEventHandlers = (j) => {
+        document.getElementById("home-btn").addEventListener("click", () => {
+          localStorage.setItem("currentLocation", "home");
+          whipeDom();
+          render("init");
+          render("courses");
+          activeEventHandlers();
+        });
+        document.getElementById("courses-btn").addEventListener("click", () => {
+          render("courses");
+          activeEventHandlers();
+        });
+        document
+          .getElementById("completed-btn")
+          .addEventListener("click", () => {
+            whipeDom();
+            for (let i = 0; i < 4; i++) {
+              if (!User.course.data.completedArray[i]) {
+                document.getElementById("cert-root").innerHTML += `
+              <div id="lesson-div-${i}" style="filter: grayscale(1); display: flex; justify-content: center;">
+                <div class="course-con" style="box-shadow: 5px 5px 28px rgb(210 210 210); border-radius: 5px; margin: 20px; cursor: pointer">
+                  <img style="border-radius: 5px 5px 0px 0px" src="${MainCourse.picsSrc[i]}" width=300 />
+                  <div style="width: 100%;  display: flex; justify-content: center; flex-direction: column;">
+                    <h2 style="display: flex; justify-content: center; font-weight: 100; color: grey;"> ${MainCourse.titles[i]} </h2>
+                    <h3 style="display: flex; justify-content: center; font-weight: 300; color: rgb(85 85 85)"> ${MainCourse.descriptions[i]}</h3>
+                      <div style="display: flex; justify-content: center; gap: 40px">
+                        <div style="display: flex;">
+                          <img width=45 height=45 src="https://sliquid.com/wp-content/uploads/2024/03/360_F_163489083_ePjmcRDlTr9qi2Et08f0J001vp5YZuW4.jpg"/>
+                          <p style="color: #00a2e1;"> complete </p>
+                        </div>
+                        <div style="display: flex;">
+                          <img width=45 height=45 src="https://sliquid.com/wp-content/uploads/2024/03/360_F_529739662_yRW6APsQg3PaJGQ6afQL8hDdod0OR1re.jpg" />
+                         <p style="color: #00a2e1;"> 0 </p>
+                        </div>
+                      </div>
+                  </div>
+                </div>
+            </div>
+          `;
+              }
+            }
+            activeEventHandlers();
+          });
+        (() => {
+          if (!User.course.data.completedArray[j]) {
+            for (let i = 0; i < MainCourse.lessonsAmount[j]; i++) {
+              document
+                .getElementById(`pcourse-${i}-${j}`)
+                .addEventListener("click", () => {
+                  localStorage.setItem("currentLocation", "incourse");
+                  localStorage.setItem("inlessonj", j);
+                  localStorage.setItem("inlessoni", i);
+                  render("incourse", "", j, i);
+                  render("questions", "", j, i);
+                  for (let k = 0; k < 4; k++) {
+                    document
+                      .getElementById(`q-${j}-${i}-${k}`)
+                      .addEventListener("click", (e) => {
+                        currrentAnswer = e.target.value;
+                        alert(currrentAnswer);
+                      });
+                  }
+                  document
+                    .getElementById("in-course-back-btn")
+                    .addEventListener("click", () => {
+                      localStorage.setItem("currentLocation", "lessons");
+                      document.getElementById("cert-root").innerHTML = "";
+                      document.getElementById(
+                        "cert-root"
+                      ).innerHTML = `<button style="border: none; background-color: white; margin: 10px;" id="back-btn"> <img width=30
+                      src="https://sliquid.com/wp-content/uploads/2024/03/left-arrow-back-button-back-arrow-icon-vector.jpg"/> </button>`;
+                      render(
+                        "lessons",
+                        localStorage.getItem("currentCourse"),
+                        j
+                      );
+                    });
+                });
+            }
+            document.getElementById("courses-div").style.display = "none";
+            document
+              .getElementById("back-btn")
+              .addEventListener("click", () => {
+                localStorage.setItem("currentLocation", "home");
+                document.getElementById("courses-div").style.display = "flex";
+                document.getElementById("cert-root").innerHTML = "";
+                render("courses");
+                activeEventHandlers();
+              });
+          }
+        })();
+      };
+
       // this is the main function, it can usually just take a string and will render HTML to the cert root via that input
       // or more specific index params for certain nested actions to determine which category or lesson you're in
       // makes for dynamic "single page feel" by rendering to a root, although events can probably be re worked so: TODO
@@ -300,12 +428,12 @@
             document.getElementById("quiz-info-div").style.display = "none";
             document.getElementById("courses-div").style.display = "flex";
             document.getElementById("cert-top-div").innerHTML = `
-            <h3 style="position: absolute; left: 20px; border-right: solid 1px #00a2e1; padding: 8px; padding-right: 20px;"> ${localStorage.getItem(
+            <h3 style="position: absolute; left: 20px; border-right: solid 5px #00a2e1; padding: 8px; padding-right: 20px;"> ${localStorage.getItem(
               "name"
             )} </h3>
-            <h3 style="padding: 8px; font-weight: 200;"> home </h3>
-            <h3 style="padding: 8px; font-weight: 200;"> courses </h3>
-            <h3 style="padding: 8px; font-weight: 200"> completed </h3>
+            <h3 id="home-btn" style="padding: 8px; font-weight: 200;"> home </h3>
+            <h3 id="courses-btn" style="padding: 8px; font-weight: 200;"> courses </h3>
+            <h3 id="completed-btn" style="padding: 8px; font-weight: 200"> completed </h3>
             <img width=50 style="position: absolute; right: 20px; padding: 8px; padding-right: 20px;" src="https://sliquid.com/wp-content/uploads/2023/10/cropped-LotusFavicon.png" />
           `;
             break;
@@ -313,11 +441,25 @@
           }
           case "courses": {
             document.getElementById("courses-div").innerHTML = "";
+            document.getElementById("cert-root").innerHTML = `
+              <div style="display: block; justify-content: center; width: 100%; background-color: #00a2e1; padding: 20px; gap: 150px;">
+                <h1 style="display: flex; justify-content: center; font-weight: 300; color: white"> Welcome to the Sliquid Ambassador Program</h1>
+                <div style="display:  flex; justify-content: center; gap: 100px;">
+                <p style="text-align: center; width: 400px; font-size: 26px; color: white; font-weight: 100"> As they say, necessity is the mother of all invention. Dean’s wife is one of the many women who have sensitivities to glycerin and the other questionable ingredients that are commonly used in the production of lubricants. Believing that he could create a healthier, more natural option that would work better for all women, Dean set out to create lubricants without sugar and sugar derivatives (glycerin), using only the safest ingredients, making it the cleanest, most natural lubricant on the market.</p>
+                <video controls src='Welcome.mp4' width=800> </video>
+                </div>
+                <div style="display: flex; justify-content: center;">
+                <button style="width: 400px; margin: 20px; padding: 20px; border: solid 2px lightblue; font-size: 20px; border-radius: 10px;"> learn more </button>
+                </div>
+              </div>
+              <h1 style="display: flex; justify-content: center; font-weight: 300;">All Courses</h1>
+              `;
             for (let i = 0; i < 4; i++) {
-              document.getElementById("courses-div").innerHTML += User.main
-                .course.data.completedArray[i]
+              document.getElementById("courses-div").innerHTML += User.course
+                .data.completedArray[i]
                 ? `
-            <div id="lesson-div-${i}" style="display: flex; justify-content: center;">
+                <br>
+              <div id="lesson-div-${i}" style="filter: grayscale(1); display: flex; justify-content: center;">
                 <div class="course-con" style="box-shadow: 5px 5px 28px rgb(210 210 210); border-radius: 5px; margin: 20px; cursor: pointer">
                   <img style="border-radius: 5px 5px 0px 0px" src="${MainCourse.picsSrc[i]}" width=300 />
                   <div style="width: 100%;  display: flex; justify-content: center; flex-direction: column;">
@@ -326,19 +468,17 @@
                       <div style="display: flex; justify-content: center; gap: 40px">
                         <div style="display: flex;">
                           <img width=45 height=45 src="https://sliquid.com/wp-content/uploads/2024/03/360_F_163489083_ePjmcRDlTr9qi2Et08f0J001vp5YZuW4.jpg"/>
-                          <p style="color: #00a2e1;"> ${MainCourse.lessonsAmount[i]} lessons </p>
+                          <p style="color: #00a2e1;"> complete </p>
                         </div>
                         <div style="display: flex;">
                           <img width=45 height=45 src="https://sliquid.com/wp-content/uploads/2024/03/360_F_529739662_yRW6APsQg3PaJGQ6afQL8hDdod0OR1re.jpg" />
-                         <p style="color: #00a2e1;"> done </p>
+                         <p style="color: #00a2e1;"> 0 </p>
                         </div>
                       </div>
                   </div>
                 </div>
-            </div>
-                `
-                : `
-            <div id="lesson-div-${i}" style="display: flex; justify-content: center;">
+            </div>`
+                : `<div id="lesson-div-${i}" style="display: flex; justify-content: center;">
                 <div class="course-con" style="box-shadow: 5px 5px 28px rgb(210 210 210); border-radius: 5px; margin: 20px; cursor: pointer">
                   <img style="border-radius: 5px 5px 0px 0px" src="${MainCourse.picsSrc[i]}" width=300 />
                   <div style="width: 100%;  display: flex; justify-content: center; flex-direction: column;">
@@ -387,14 +527,25 @@
             }
             document.getElementById("cert-root").innerHTML = "";
             document.getElementById("cert-root").innerHTML = `
-               <button style="border: none; background-color: white; margin: 10px;" id="in-course-back-btn"> 
+               <button style="border: none; background-color: white; margin: 10px;" id="in-course-back-btn">
                <img width=30 src="https://sliquid.com/wp-content/uploads/2024/03/left-arrow-back-button-back-arrow-icon-vector.jpg"/> </button>
                <h1 style="display: flex; justify-content: center; font-weight: 100;"> ${MainCourse.titles[j]} </h1>
                <p style="display: flex; justify-content: center;"> course ${i} </p>
                <div style="position: relative; overflow: hidden; padding-top: 56.25%;">
-               <iframe src="https://share.synthesia.io/embeds/videos/9c3a1cff-4932-4cd8-9894-a8ecc5b1f814" loading="lazy" title="Synthesia video player 
+               <iframe src="https://share.synthesia.io/embeds/videos/9c3a1cff-4932-4cd8-9894-a8ecc5b1f814" loading="lazy" title="Synthesia video player
                - Your AI video" allow="encrypted-media; fullscreen;" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0; margin: 0; overflow:hidden;"></iframe></div>
                `;
+            document
+              .getElementById("in-course-back-btn")
+              .addEventListener("click", () => {
+                localStorage.setItem("currentLocation", "lessons");
+                document.getElementById("cert-root").innerHTML = "";
+                document.getElementById(
+                  "cert-root"
+                ).innerHTML = `<button style="border: none; background-color: white; margin: 10px;" id="back-btn"> <img width=30
+                        src="https://sliquid.com/wp-content/uploads/2024/03/left-arrow-back-button-back-arrow-icon-vector.jpg"/> </button>`;
+                render("lessons", "", j);
+              });
             break;
             return;
           }
@@ -402,12 +553,11 @@
             document.getElementById("cert-root").innerHTML = "";
             document.getElementById(
               "cert-root"
-            ).innerHTML = ` <button style="border: none; background-color: white; margin: 10px;" id="back-btn"> 
-              <img width=30 src="https://sliquid.com/wp-content/uploads/2024/03/left-arrow-back-button-back-arrow-icon-vector.jpg"/> </button>
-
-              `;
+            ).innerHTML = ` <button style="border: none; background-color: white; margin: 10px;" id="back-btn">
+              <img width=30 src="https://sliquid.com/wp-content/uploads/2024/03/left-arrow-back-button-back-arrow-icon-vector.jpg"/> </button>`;
             let j = cindex;
             let currentC = "";
+
             switch (j) {
               case 0: {
                 currentC = "Naturals";
@@ -446,21 +596,23 @@
                 }
               }
             }
+
+            document.getElementById("cert-root").innerHTML += `
+            <hr style="border: solid 1px grey"> 
+            <br>
+            <h1 style="display: flex; justify-content: center; font-weight: 100; font-size: 40px; margin-top: -10px;"> ${currentC} - Lessons</h1>
+            `;
             for (let i = 0; i < MainCourse.lessonsAmount[j]; i++) {
               document.getElementById("cert-root").innerHTML += `
               <div style="display: flex; justify-content: center;">
-              <div style="display: flex; justify-content: center; border: solid 1px grey; border-radius: 5px; width: 90%; padding: 8px; margin: 10px;">
-                   <p id="pcourse-${i}-${j}" style="cursor: pointer; border-radius: 2px; width: 70%;"> Sliquid ${currentC} ${
+              <div style="background-color: #02506e; display: flex; justify-content: center; border: solid 1px white; border-radius: 0px; width: 90%; padding: 8px; margin: 1px;">
+              <p style="border-radius: 2px; width: 70%; color: white;"> Sliquid ${currentC} ${
                 MainCourse.collections[j][i].collectionName
               }</p>
               ${
-                !User.main.course.data.collections[j][i].done
-                  ? `
-              <button style="background-color: #00a2e1; color: white; font-weight: 1000; border: none; width: 30%; border-radius: 5px;"> begin lesson </button>
-                  `
-                  : `
-              <button style="background-color: grey; color: white; font-weight: 1000; border: none; width: 30%; border-radius: 5px;"> finished </button>
-                  `
+                !User.course.data.collections[j][i].done
+                  ? `<button id="pcourse-${i}-${j}" style="cursor: pointer; background-color: #00a2e1; color: white; font-weight: 1000; border: none; width: 30%; border-radius: 5px;"> begin lesson </button>`
+                  : `<button id="pcourse-${i}-${j}" style="cursor: pointer; background-color: grey; color: white; font-weight: 1000; border: none; width: 30%; border-radius: 5px;"> review </button>`
               }
               </div>
               </div>
@@ -469,6 +621,7 @@
             document
               .getElementById("back-btn")
               .addEventListener("click", () => {
+                localStorage.setItem("currentLocation", "home");
                 document.getElementById("courses-div").style.display = "flex";
                 document.getElementById("cert-root").innerHTML = "";
                 render("courses");
@@ -491,16 +644,13 @@
                   document
                     .getElementById("in-course-back-btn")
                     .addEventListener("click", () => {
+                      localStorage.setItem("currentLocation", "lessons");
                       document.getElementById("cert-root").innerHTML = "";
                       document.getElementById(
                         "cert-root"
                       ).innerHTML = `<button style="border: none; background-color: white; margin: 10px;" id="back-btn"> <img width=30
-                                src="https://sliquid.com/wp-content/uploads/2024/03/left-arrow-back-button-back-arrow-icon-vector.jpg"/> </button>`;
-                      render(
-                        "lessons",
-                        localStorage.getItem("currentCourse"),
-                        j
-                      );
+                        src="https://sliquid.com/wp-content/uploads/2024/03/left-arrow-back-button-back-arrow-icon-vector.jpg"/> </button>`;
+                      render("lessons", "", j);
                     });
                 });
             }
@@ -512,8 +662,8 @@
             let i = iindex;
             for (let k = 0; k < 4; k++) {
               document.getElementById("cert-root").innerHTML += `
-                <input id="q-${j}-${i}-${k}" type="radio" value="q-${j}-${i}-${k}">
-                <label for="q-${j}-${i}-${k}"> ${MainCourse.questions[j][i][k]} </label><br>`;
+              <input id="q-${j}-${i}-${k}" type="radio" value="q-${j}-${i}-${k}">
+              <label for="q-${j}-${i}-${k}"> ${MainCourse.questions[j][i][k]} </label><br>`;
             }
           }
         }
@@ -529,20 +679,21 @@
         }
         return tmp;
       }
-      // where the basic authentication happens, which upon passing will check the users current page location thats stored and will
-      // render accordingly. This happens everypage load so users page will persist through loads despite being a false single page application
       class Lesson {
         done = false;
       }
       let authKey = 0;
       // singleton instance of the Course class, just for data origanization
       const MainCourse = new Course();
+      // where the basic authentication happens, which upon passing will check the users current page location thats stored and will
+      // render accordingly. This happens everypage load so users page will persist through loads despite being a false single page application
       if (localStorage.getItem("name")) {
         if (
           localStorage.getItem("quizAuth") ==
           hash(localStorage.getItem("name")) +
             hash(localStorage.getItem("email"))
         ) {
+          // on first log in captures and saves "MainCourse" object into "User" object which allows for multi user experiance
           if (!localStorage.getItem("firstLog")) {
             User = {
               name: localStorage.getItem("name"),
@@ -552,18 +703,64 @@
               },
             };
             localStorage.setItem("User", JSON.stringify(User));
+            localStorage.setItem("currentLocation", "home");
           }
           localStorage.setItem("firstLog", true);
           if (localStorage.getItem("currentLocation")) {
             switch (localStorage.getItem("currentLocation")) {
               case "home": {
                 render("init");
+                console.log(User);
                 render("courses");
                 activeEventHandlers();
                 break;
               }
               case "incourse": {
-                alert("rendering incourse");
+                render("init");
+                render(
+                  "incourse",
+                  "",
+                  localStorage.getItem("inlessonj"),
+                  localStorage.getItem("inlessoni")
+                );
+                render(
+                  "questions",
+                  "",
+                  localStorage.getItem("inlessonj"),
+                  localStorage.getItem("inlessoni")
+                );
+
+                document
+                  .getElementById("in-course-back-btn")
+                  .addEventListener("click", () => {
+                    localStorage.setItem("currentLocation", "lessons");
+                    document.getElementById("cert-root").innerHTML = "";
+                    document.getElementById(
+                      "cert-root"
+                    ).innerHTML = `<button style="border: none; background-color: white; margin: 10px;" id="back-btn"> <img width=30
+                        src="https://sliquid.com/wp-content/uploads/2024/03/left-arrow-back-button-back-arrow-icon-vector.jpg"/> </button>`;
+                    let j;
+                    switch (localStorage.getItem("currentCourse")) {
+                      case "naturals": {
+                        j = 0;
+                        break;
+                      }
+                      case "organics": {
+                        j = 1;
+                        break;
+                      }
+                      case "balance": {
+                        j = 2;
+                        break;
+                      }
+                      case "misc": {
+                        j = 3;
+                        break;
+                      }
+                    }
+                    render("lessons", localStorage.getItem("currentCourse"), j);
+                  });
+                activeEventHandlers();
                 break;
               }
               case "lessons": {
@@ -628,7 +825,7 @@
           alert("email too short to be valid");
           return;
         }
-
+        // captures current state of "MainCourse" on logging into "User" object on pressing log in button
         User = {
           name: localStorage.getItem("name"),
           email: localStorage.getItem("email"),
@@ -646,6 +843,7 @@
         location.reload();
       });
     </script>
+    <script></script>
   </body>
 </html>
 <style>
@@ -665,7 +863,7 @@
   }
   @keyframes fadein {
     from {
-      transform: scale(10.5);
+      transform: scale(1.1);
       opacity: 0;
     }
     to {
